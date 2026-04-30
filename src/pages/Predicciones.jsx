@@ -1,17 +1,32 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import api from '../services/api';
 import { FiTrendingUp, FiRefreshCw } from 'react-icons/fi';
 
+// Cache global para que persista entre navegaciones
+let cacheData = null;
+let cacheTime = null;
+
 export default function Predicciones() {
-  const [predicciones, setPredicciones] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [predicciones, setPredicciones] = useState(cacheData || []);
+  const [loading, setLoading] = useState(!cacheData);
   const [error, setError] = useState(null);
 
-  const fetchData = () => {
+  const fetchData = (force = false) => {
+    // Si hay cache de menos de 5 minutos, no recargar
+    if (!force && cacheData && cacheTime && (Date.now() - cacheTime < 300000)) {
+      setPredicciones(cacheData);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     setError(null);
-    api.get('/predicciones', { timeout: 120000 })
-      .then(r => { setPredicciones(r.data); setLoading(false); })
+    api.get('/predicciones', { timeout: 180000 })
+      .then(r => {
+        cacheData = r.data;
+        cacheTime = Date.now();
+        setPredicciones(r.data);
+        setLoading(false);
+      })
       .catch(e => { setError('Error al cargar predicciones. Intenta de nuevo.'); setLoading(false); });
   };
 
@@ -22,7 +37,7 @@ export default function Predicciones() {
   if (loading) return (
     <div className="flex flex-col items-center justify-center py-20 gap-4">
       <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full" />
-      <p className="text-gray-500">Calculando predicciones para 156 productos...</p>
+      <p className="text-gray-500">Calculando predicciones para {cacheData ? 'actualizar' : '156 productos'}...</p>
       <p className="text-gray-400 text-sm">Esto puede tardar hasta 2 minutos</p>
     </div>
   );
@@ -30,17 +45,19 @@ export default function Predicciones() {
   if (error) return (
     <div className="text-center py-20">
       <p className="text-red-500 mb-4">{error}</p>
-      <button onClick={fetchData} className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 mx-auto hover:bg-blue-700"><FiRefreshCw /> Reintentar</button>
+      <button onClick={() => fetchData(true)} className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 mx-auto hover:bg-blue-700"><FiRefreshCw /> Reintentar</button>
     </div>
   );
 
-  // Separar productos con ventas de los sin ventas
   const conVentas = predicciones.filter(p => p.diasRestantes < 999);
   const sinVentas = predicciones.filter(p => p.diasRestantes >= 999);
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2"><FiTrendingUp /> Predicción de Stock</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2"><FiTrendingUp /> Predicción de Stock</h1>
+        <button onClick={() => fetchData(true)} className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700"><FiRefreshCw /> Actualizar</button>
+      </div>
 
       <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
         <div className="bg-blue-50 px-4 py-3 border-b">
