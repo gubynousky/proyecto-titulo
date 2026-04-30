@@ -72,18 +72,19 @@ export default function Ventas() {
             <form onSubmit={handleSubmit} className="space-y-3">
               {detalles.map((d, i) => (
                 <div key={i} className="flex gap-2 items-center">
-                  <select value={d.productoId} onChange={e => updateDetalle(i, 'productoId', e.target.value)} className="flex-1 border rounded-lg px-3 py-2 focus:outline-none" required>
+                  <select value={d.productoId} onChange={e => updateDetalle(i, 'productoId', e.target.value)} className="flex-1 border rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-green-500 focus:outline-none text-sm" required>
                     <option value="">Seleccionar producto</option>
                     {productos.filter(p => p.activo && p.stock > 0).map(p => <option key={p.id} value={p.id}>{p.nombre} (Stock: {p.stock}) - ${p.precio?.toLocaleString('es-CL')}</option>)}
                   </select>
-                  <input type="number" min="1" value={d.cantidad} onChange={e => updateDetalle(i, 'cantidad', e.target.value)} className="w-20 border rounded-lg px-3 py-2 focus:outline-none" />
-                  {detalles.length > 1 && <button type="button" onClick={() => removeDetalle(i)} className="text-red-500"><FiTrash2 /></button>}
+                  <input type="number" min="1" value={d.cantidad} onChange={e => updateDetalle(i, 'cantidad', e.target.value)}
+                    className="w-20 border rounded-lg px-2 py-2.5 text-center focus:ring-2 focus:ring-green-500 focus:outline-none text-sm" />
+                  {detalles.length > 1 && <button type="button" onClick={() => removeDetalle(i)} className="text-red-500 p-1"><FiTrash2 /></button>}
                 </div>
               ))}
               <button type="button" onClick={addDetalle} className="text-blue-600 text-sm hover:underline">+ Agregar producto</button>
               <div className="flex gap-3 pt-2">
-                <button type="button" onClick={() => setShowModal(false)} className="flex-1 border py-2 rounded-lg hover:bg-gray-50">Cancelar</button>
-                <button type="submit" className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700">Registrar Venta</button>
+                <button type="button" onClick={() => setShowModal(false)} className="flex-1 border border-gray-300 py-2.5 rounded-lg hover:bg-gray-50">Cancelar</button>
+                <button type="submit" className="flex-1 bg-green-600 text-white py-2.5 rounded-lg hover:bg-green-700 font-semibold">Registrar Venta</button>
               </div>
             </form>
           </div>
