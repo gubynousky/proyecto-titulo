@@ -67,7 +67,7 @@ export default function Ventas() {
 
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl w-full max-w-lg p-6">
+          <div className="bg-white rounded-xl w-full max-w-2xl p-6">
             <h2 className="text-xl font-bold mb-4">Nueva Venta</h2>
             <form onSubmit={handleSubmit} className="space-y-3">
               {detalles.map((d, i) => (
