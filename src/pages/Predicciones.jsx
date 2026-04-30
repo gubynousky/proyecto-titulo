@@ -13,7 +13,7 @@ export default function Predicciones() {
 
   const fetchData = (force = false) => {
     // Si hay cache de menos de 5 minutos, no recargar
-    if (!force && cacheData && cacheTime && (Date.now() - cacheTime < 300000)) {
+    if (!force && cacheData) {
       setPredicciones(cacheData);
       setLoading(false);
       return;
